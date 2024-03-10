@@ -7,11 +7,14 @@ import com.easywork.easywork.input.util.InputUtil;
 import com.easywork.easywork.model.Employee;
 import com.easywork.easywork.sevice.EmployeeService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/management/employees")
@@ -24,9 +27,12 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    Employee one(@PathVariable Long id) {
-        return employeeService.getById(id)
-                .orElseThrow(() -> new PayrollNotFoundException(id, "Employee"));
+    ResponseEntity<Employee>  one(@PathVariable Long id) {
+        Optional<Employee> employee = employeeService.getById(id);
+       if(employee.isPresent()) {
+           return new ResponseEntity<>(employee.get(), HttpStatus.OK);
+       }
+       throw new PayrollNotFoundException(id, "Employee");
     }
 
     @GetMapping
@@ -35,9 +41,9 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public Employee newEmployee(@RequestBody @Valid EmployeeInput input) {
+    public ResponseEntity<Employee> newEmployee(@RequestBody @Valid EmployeeInput input) {
         try {
-            return employeeService.saveEmployee(input);
+            return new ResponseEntity<>(employeeService.saveEmployee(input), HttpStatus.CREATED);
         } catch (DateTimeParseException e) {
             throw new PayrollBadRequestException("Wrong datetime on request! date should be on yyyy-MM-dd format");
         }
