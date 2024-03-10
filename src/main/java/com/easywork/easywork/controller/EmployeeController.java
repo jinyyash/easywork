@@ -19,7 +19,6 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
-@Tag(name ="Employee", description ="Employee API")
 @RestController
 @RequestMapping("/api/v1/management/employees")
 public class EmployeeController implements EmployeeAPI {
@@ -30,12 +29,7 @@ public class EmployeeController implements EmployeeAPI {
         this.employeeService = employeeService;
     }
 
-    @Operation(
-            summary = "Fetch Employee by ID",
-            description = "fetches employee entity and their data from data source")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation")
-    })
+
     @GetMapping("/{id}")
     public ResponseEntity<Employee> one(@PathVariable Long id) {
         Optional<Employee> employee = employeeService.getById(id);
@@ -45,23 +39,10 @@ public class EmployeeController implements EmployeeAPI {
        throw new PayrollNotFoundException(id, "Employee");
     }
 
-    @Operation(
-            summary = "Fetch All Employee by ID",
-            description = "fetches all employee entity and their data from data source")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation")
-    })
     @GetMapping
     public List<Employee> all() {
         return employeeService.getAll();
     }
-    @Operation(
-            summary = "Create new Employee",
-            description = "Create a new Employee on system")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "created"),
-            @ApiResponse(responseCode = "400", description = "bad request")
-    })
     @PostMapping
     public ResponseEntity<Employee> newEmployee(@RequestBody @Valid EmployeeInput input) {
         try {
